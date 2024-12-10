@@ -1,11 +1,29 @@
 from dataclasses import dataclass
 from datetime import datetime
+from enum import Enum
+import socket
+
+
+class Event(Enum):
+    LIGHTING = "LIGHTING"
+    HEATING = "HEATING"
+    WATERING = "WATERING"
+    VENTILATION = "VENTILATION"
+    OTHER = "OTHER"
+
+
+class ControlStatus(Enum):
+    ON = "ON"
+    OFF = "OFF"
+    UNKNOWN = "UNKNOWN"
 
 
 @dataclass
 class SysemProperties:
     """Properties of the whole system."""
 
+    hostname = socket.gethostname()
+    fqdn = socket.getfqdn()
     name = "greenhouse_controller"
     version = "0.1.0"
     sleep_minutes = 30
@@ -65,3 +83,7 @@ class BackendProperties:
 
     api_host = "192.168.2.12"
     api_port = 8899
+    events_endpoint = "/api/events"
+    heating_endpoint = "/api/heating"
+    lighting_endpoint = "/api/lighting"
+    watering_endpoint = "/api/watering"
