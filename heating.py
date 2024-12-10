@@ -23,13 +23,41 @@ dht_device_heat_3 = None
 heatingIsOn = False
 
 
-def init():
-    print("heating init() ")
-    dht_device_temp_1 = adafruit_dht.DHT22(board.D17)
-    # dht11_device = adafruit_dht.DHT11(board.D17)
+def sendToBackend(temperature, humidity):
+    url = (
+        "http://"
+        + BackendProperties.api_host
+        + ":"
+        + str(BackendProperties.api_port)
+        + BackendProperties.heating_endpoint
+    )
+    data = (
+        '{  "temperature": '
+        + str(temperature)
+        + ',  "humidity": '
+        + str(humidity)
+        + ',  "sensorId": "t001",  "sensorName": "temp ghouse 001",  "datestamp": "'
+        + str(datetime.now)
+        + '"}'
+    )
+    myResponse = requests.post(url, data=data, auth=("andy", "testPasswd"), timeout=5)
+    if myResponse.ok:
+        print("response: " + myResponse.json())
+        # Loading the response data into a dict variable
+        # json.loads takes in only binary or string variables so using content to fetch binary content
+        # Loads (Load String) takes a Json file and converts into python data structure (dict or list, depending on JSON)
+        jData = json.loads(myResponse.content)
+        print("The response contains {0} properties".format(len(jData)))
+        print("\n")
+        for key in jData:
+            print(key + " : " + jData[key])
+    else:
+        print("failed to send readings to server : " + url + "[" + data + "]")
+        myResponse.raise_for_status()
 
 
 def run():
+    dht_device_temp_1 = adafruit_dht.DHT22(board.D17)  # pin 11 - GPIO 17
     try:
         temperature_c = dht_device_temp_1.temperature
         temperature_f = temperature_c * (9 / 5) + 32
@@ -60,35 +88,5 @@ def run():
     except RuntimeError as err:
         print(err.args[0])
 
-
-def sendToBackend(temperature, humidity):
-    url = (
-        "http://"
-        + BackendProperties.api_host
-        + ":"
-        + BackendProperties.api_port
-        + BackendProperties.heating_endpoint
-    )
-    data = (
-        '{  "temperature": '
-        + temperature
-        + ',  "humidity": '
-        + humidity
-        + ',  "sensorId": "t001",  "sensorName": "temp ghouse 001",  "datestamp": "'
-        + datetime.now
-        + '"}'
-    )
-    myResponse = requests.post(url, data=data)
-    if myResponse.ok:
-        print("response: " + myResponse.json())
-        # Loading the response data into a dict variable
-        # json.loads takes in only binary or string variables so using content to fetch binary content
-        # Loads (Load String) takes a Json file and converts into python data structure (dict or list, depending on JSON)
-        jData = json.loads(myResponse.content)
-        print("The response contains {0} properties".format(len(jData)))
-        print("\n")
-        for key in jData:
-            print(key + " : " + jData[key])
-    else:
-        print("failed to send readings to server : " + url)
-        myResponse.raise_for_status()
+    print("heating tidy up dht sensor")
+    dht_device_temp_1.exit()

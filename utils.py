@@ -24,7 +24,7 @@ def logEvent(event, aDatetime, status):
         "http://"
         + BackendProperties.api_host
         + ":"
-        + BackendProperties.api_port
+        + str(BackendProperties.api_port)
         + BackendProperties.events_endpoint
     )
     data = (
@@ -33,10 +33,10 @@ def logEvent(event, aDatetime, status):
         + '",  "controlStatus": "'
         + status
         + '",  "datestamp": "'
-        + aDatetime
-        + '"    }'
+        + str(aDatetime)
+        + '" }'
     )
-    myResponse = requests.post(url, data=data)
+    myResponse = requests.post(url, data=data, auth=("andy", "testPasswd"), timeout=5)
     if myResponse.ok:
         print("response: " + myResponse.json())
         # Loading the response data into a dict variable
@@ -48,5 +48,5 @@ def logEvent(event, aDatetime, status):
         for key in jData:
             print(key + " : " + jData[key])
     else:
-        print("failed to send event to server : " + url)
+        print("failed to send event to server : " + url + "[" + data + "]")
         myResponse.raise_for_status()
