@@ -3,12 +3,17 @@ import adafruit_dht
 import board
 import platform
 import requests
-from properties import BackendProperties, SysemProperties, HeatingProperties
+from properties import (
+    BackendProperties,
+    SysemProperties,
+    Event,
+    ControlStatus,
+    LightingProperties,
+)
 import json
 import utils
 
 dht_device = None
-lightsOn = False
 
 
 def init():
@@ -17,12 +22,17 @@ def init():
     # dht11_device = adafruit_dht.DHT11(board.D17)
 
 
+def lightingIsOn():
+    return utils.getMetadata("lighting") == "on"
+
+
 def run():
-    if utils.isDaytime() and not lightsOn:
+    global lightsOn
+    if utils.isDaytime() and not lightingIsOn():
         print("lighting on")
-        lightsOn = True
-        # utils.logEvent(Event.LIGHTING, LocalDateTime.now(), ControlStatus.ON)
-    elif not utils.isDaytime() and lightsOn:
+        utils.setMetadata("lighting", "on")
+        utils.logEvent(Event.LIGHTING, utils.getDatetimeAsString(), ControlStatus.ON)
+    elif not utils.isDaytime() and lightingIsOn():
         print("lighting off")
-        lightsOn = False
-        # utils.logEvent(Event.LIGHTING, LocalDateTime.now(), ControlStatus.OFF)
+        utils.setMetadata("lighting", "off")
+        utils.logEvent(Event.LIGHTING, utils.getDatetimeAsString(), ControlStatus.OFF)

@@ -1,9 +1,7 @@
 # https://github.com/adafruit/Adafruit_CircuitPython_DHT
 
-import time
-import adafruit_dht
-import board
 import platform
+import utils
 
 import heating
 import lighting
@@ -19,9 +17,7 @@ print(platformName)
 # except:
 #     pass
 
-heating.init()
-lighting.init()
-watering.init()
+utils.initDb()
 
 while True:
     heating.run()

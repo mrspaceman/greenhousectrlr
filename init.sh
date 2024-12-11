@@ -13,6 +13,6 @@ else
     source env/bin/activate
 fi
 
-python3 ~/greenhousectrlr/greenhouse.py
+python3 ./greenhouse.py
 
 

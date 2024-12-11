@@ -25,7 +25,10 @@ class SysemProperties:
     hostname = socket.gethostname()
     fqdn = socket.getfqdn()
     name = "greenhouse_controller"
+    ipaddr = socket.gethostbyname(socket.gethostname())
     version = "0.1.0"
+    db_filename = "sensor.db"
+    db_tablename = "sensor_data"
     sleep_minutes = 30
     sleep_minutes_lighting = 30
     sleep_minutes_heating = 30
@@ -81,9 +84,9 @@ class WateringProperties:
 class BackendProperties:
     """Properties of the backend API."""
 
-    api_host = "192.168.2.12"
-    api_port = 8899
-    events_endpoint = "/api/events"
-    heating_endpoint = "/api/heating"
-    lighting_endpoint = "/api/lighting"
-    watering_endpoint = "/api/watering"
+    api_host = "192.168.2.20"
+    api_port = 8080
+    events_endpoint = "/api/greenhouse/events"
+    heating_endpoint = "/api/greenhouse/heating"
+    lighting_endpoint = "/api/greenhouse/lighting"
+    watering_endpoint = "/api/greenhouse/watering"
